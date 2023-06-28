@@ -16,10 +16,25 @@ class RestaurantsController < ApplicationController
   def destroy
     restaurant = Restaurant.find_by(id: params[:id])
     if restaurant
+       restaurant.pizzas.destroy_all
       restaurant.destroy
-      render json: {}, status: :no_content
+      head :no_content
     else
-      render json: { error: "Restaurant not found" }, status: :not_found
+      render_not_found_response
     end
+  end
+
+  private
+
+  def find_restaurant
+    Restaurant.find(params[:id])
+  end
+
+  def restaurant_params
+    params.permit(:name, :address)
+  end
+
+  def render_not_found_response
+    render json: { error: "Restaurant not found" }, status: :not_found
   end
 end
